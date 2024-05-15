@@ -36,9 +36,11 @@ const regex = /^https?:\/\/([a-z]+\.|)tiktok\.com\/([\w]+|\@\D+\w+)/g;
   //bot.sendMessage(chatId, `${text}`);
   if (text == '/start'){
       bot.sendChatAction(chatId, 'typing')
+      sleep(200)
       bot.sendMessage(chatId, 'bot started 😁👋 paste tiktok video or photo link.',{"reply_to_message_id":`${msg_id}`});
   } else if (text.match(regex)){
     bot.sendChatAction(chatId, 'typing')
+    sleep(200)
       bot.sendMessage(chatId, `wait.. check photo or video.`,{"reply_to_message_id":`${msg_id}`})
       
       var words = text.split(' ');
@@ -49,6 +51,7 @@ const regex = /^https?:\/\/([a-z]+\.|)tiktok\.com\/([\w]+|\@\D+\w+)/g;
             if (wo == '--json'){
                 //console.log(`text ke 2 adalah berformat json`)
                 bot.sendChatAction(chatId, 'typing')
+                sleep(200)
                 async function gut(one){
                 var { data } = await axios.get(`https://tt-api-dl.vercel.app/down?version=v2&link=${one}`);
 		var jsong = JSON.stringify(data)
@@ -61,12 +64,15 @@ const regex = /^https?:\/\/([a-z]+\.|)tiktok\.com\/([\w]+|\@\D+\w+)/g;
             } else if (wo == '--music'){
                 //console.log(`text ke 2 adalah berformat text`)
                 bot.sendChatAction(chatId, 'record_voice')
+                sleep(200)
                 async function got(one){
                 var { data } = await axios.get(`https://tt-api-dl.vercel.app/down?version=v3&link=${one}`);
                 bot.editMessageText(`detect ${data.result.type} type. && send music`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
                 try {
                 await bot.sendAudio(chatId, `${data.result.music}`);
                 } catch (e){
+                  bot.sendChatAction(chatId, 'typing')
+                  sleep(200)
                  bot.sendMessage(chatId, `[download music](${data.result.music})`,{"parse_mode":"markdownv2"});
                 }
                 sleep(300)
@@ -95,6 +101,7 @@ const regex = /^https?:\/\/([a-z]+\.|)tiktok\.com\/([\w]+|\@\D+\w+)/g;
             if (type == "video"){
             //bot.deleteMessage(chatId, `${msgid}`)
             bot.sendChatAction(chatId, 'upload_video')
+            await sleep(200)
             try{
             var escaped = desc.replace(/#/g, "\\#")
             await bot.sendVideo(chatId, `${data.result.video2}`,
@@ -113,17 +120,20 @@ const regex = /^https?:\/\/([a-z]+\.|)tiktok\.com\/([\w]+|\@\D+\w+)/g;
             sleep(300)
             bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
             } else {
-             bot.sendChatAction(chatId, 'upload_photo') 
+             bot.sendChatAction(chatId, 'upload_photo')
 	    //bot.deleteMessage(chatId, `${msgid}`)
                 var dat = data.result.images
             for (let i = 0; i < dat.length; i++) {
                 const slide = i+1
+                bot.sendChatAction(chatId, 'upload_photo')
                 bot.sendDocument(chatId, `${dat[i]}`,{"caption":`@${author} slide ${slide}`});
             }
             sleep(300)
             bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
            }
           } catch (er){
+            bot.sendChatAction(chatId, 'typing')
+            sleep(200)
             bot.sendMessage(chatId, `${er}`);
           }
       }
@@ -132,9 +142,11 @@ const regex = /^https?:\/\/([a-z]+\.|)tiktok\.com\/([\w]+|\@\D+\w+)/g;
       //get(text)
   } else if (text == '/donate'){
     bot.sendChatAction(chatId, 'typing')
+    sleep(200)
       bot.sendPhoto(chatId, 'https://i.ibb.co/q1BD5vx/Screenshot-20240419-214501.png',{"caption":"donate for buy hosting pm @rickk1kch, tank you."})
   } else if(text == '/help'){
     bot.sendChatAction(chatId, 'typing')
+    sleep(200)
       bot.sendMessage(chatId, `Hi, this is an option for help
 > if you want to download videos or photos you just send the url
 > if you want to download music then you need to add --music after the url
@@ -142,9 +154,10 @@ const regex = /^https?:\/\/([a-z]+\.|)tiktok\.com\/([\w]+|\@\D+\w+)/g;
 Example:
 https://vt.tiktok.com/abc123 --music/--json optional`);
   } else {
-    bot.sendChatAction(chatId, 'typing') 
+    bot.sendChatAction(chatId, 'typing')
+    sleep(200)
     bot.sendMessage(chatId, "🤨 I don't understand, /help");
   }
 });
-app.listen(3000, () => console.log('Server started 3000'));
+app.listen(8080, () => console.log('Server started 3000'));
 
