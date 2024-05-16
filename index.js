@@ -79,7 +79,7 @@ async function getData(version, url){
             })()
             } else if (wo == '--music'){
                 (async function(){
-                var data = await getData('v2',`${urls}`)
+                var data = await getData('v3',`${urls}`)
                 if (data.status == "success"){
                     var jsong = JSON.stringify(data)
                     bot.editMessageText(`detect ${data.result.type} type. && send music`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
@@ -118,12 +118,11 @@ async function getData(version, url){
             bot.editMessageText(`detect ${type} type.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
             if (type == "video"){
                 bot.sendChatAction(chatId, 'upload_video')
-                sleep(200)
                 try{
                     var escaped = desc.replace(/#/g, "\\#")
-                    bot.sendVideo(chatId, `${data.result.video2}`,{"caption":`\>${escaped}\r[download HD](${data.result.video_hd})`,"parse_mode":"markdownv2"});
+                    bot.sendVideo(chatId, `${data.result.video2}`,{"caption":`\>${escaped}\r\n\r\n[download HD](${data.result.video_hd})`,"parse_mode":"markdownv2"});
                 } catch {
-                    bot.sendVideo(chatId, `${data.result.video2}`,{"caption":`${desc}`});
+                    bot.sendVideo(chatId, `${data.result.video2}`,{"caption":`${desc}\r\n\r\n[download HD](${data.result.video_hd})`,"parse_mode":"markdownv2"});
                 }
                 sleep(300)
                 bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
@@ -134,7 +133,7 @@ async function getData(version, url){
                     var slide = i+1
                     bot.sendChatAction(chatId, 'upload_photo')
                     sleep(200)
-                    bot.sendDocument(chatId, `${dat[i]}`,{"caption":`@${author} slide ${slide}`});
+                    bot.sendDocument(chatId, `${img[i]}`,{"caption":`by ${author} slide ${slide}`});
                 }
                 sleep(300)
                 bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
@@ -146,7 +145,7 @@ async function getData(version, url){
         }    
     })()
     }
-  } else if (text == '/stalk'){
+  } else if (text.includes('/stalk')){
     var words = text.split(' ');
     var wo = words[1]
     if (wo == ''){
@@ -157,7 +156,7 @@ async function getData(version, url){
     (async function(){
         var data = await getData('/stalk',`${wo}`)
         if (data.status == "success"){
-            var datail = `
+            var da = `
             username: ${data.result.users.username}\r
             nickname: ${data.result.users.nickname}\r
             verified: ${data.result.users.verified}\r
@@ -174,7 +173,7 @@ async function getData(version, url){
             bot.sendPhoto(chatId, `${data.result.users.avatarLarger}`)
             sleep(200)
             bot.sendChatAction(chatId, 'typing')
-            bot.sendMessage(chatId,detail)
+            bot.sendMessage(chatId,`${da}`)
         } else {
             bot.sendChatAction(chatId, 'typing')
             sleep(200)
