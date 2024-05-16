@@ -67,7 +67,7 @@ async function getData(version, url){
                     bot.editMessageText(`detect ${data.result.type} type. && type json`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
                     bot.sendChatAction(chatId, 'typing')
                     sleep(300)
-                    await bot.sendMessage(chatId, `${'```json'} ${jsong}${'```'}`,{"parse_mode":"markdownv2"});
+                    bot.sendMessage(chatId, `${'```json'} ${jsong}${'```'}`,{"parse_mode":"markdownv2"});
                     sleep(300)
                     bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
                 } else {
@@ -83,7 +83,7 @@ async function getData(version, url){
                     bot.sendChatAction(chatId, 'record_voice')
                     sleep(300)
                     try {
-                        await bot.sendAudio(chatId, `${data.result.music}`);
+                        bot.sendAudio(chatId, `${data.result.music}`);
                     } catch {
                         bot.sendChatAction(chatId, 'typing')
                         sleep(200)
@@ -112,12 +112,12 @@ async function getData(version, url){
             bot.editMessageText(`detect ${type} type.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
             if (type == "video"){
                 bot.sendChatAction(chatId, 'upload_video')
-                await sleep(200)
+                sleep(200)
                 try{
                     var escaped = desc.replace(/#/g, "\\#")
-                    await bot.sendVideo(chatId, `${data.result.video2}`,{"caption":`\>${escaped}\r[download HD](${data.result.video_hd})`,"parse_mode":"markdownv2"});
+                    bot.sendVideo(chatId, `${data.result.video2}`,{"caption":`\>${escaped}\r[download HD](${data.result.video_hd})`,"parse_mode":"markdownv2"});
                 } catch {
-                    await bot.sendVideo(chatId, `${data.result.video2}`,{"caption":`${desc}`});
+                    bot.sendVideo(chatId, `${data.result.video2}`,{"caption":`${desc}`});
                 }
                 sleep(300)
                 bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
