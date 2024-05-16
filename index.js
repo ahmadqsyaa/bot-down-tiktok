@@ -12,7 +12,7 @@ app.get('/',async (req,res) =>{
 function sleep(ms) {
 return new Promise(resolve => setTimeout(resolve, ms));
 }
-const token = '6830537126:AAFmP4fYhtaFmVbOkK3cJY1Cloo4Cyujyqk';
+const token = process.env.TOKEN ||'';
 const bot = new TelegramBot(token, {polling: true});
 
 
