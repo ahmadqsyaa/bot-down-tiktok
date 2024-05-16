@@ -103,6 +103,7 @@ async function getData(version, url){
                 sleep(200)
                 bot.sendMessage(chatId, `text invalid ⚠`);
             }
+
     } else {
         var data = getData('v3',`${urls}`)
         if (data.status == "success"){
@@ -138,6 +139,9 @@ async function getData(version, url){
             sleep(200)
             bot.sendMessage(chatId,`${data}`)
         }
+
+    
+    }
   } else if (text == '/stalk'){
     var words = text.split(' ');
     var wo = words[1]
