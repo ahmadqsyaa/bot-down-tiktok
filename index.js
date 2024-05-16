@@ -33,117 +33,149 @@ const msgid = msg_id+1
 const name = msg.from.first_name
 
 const regex = /^https?:\/\/([a-z]+\.|)tiktok\.com\/([\w]+|\@\D+\w+)/g;
+
+async function getData(version, url){
+    try {
+        if (version == '/stalk'){
+            var { data } = await axios.get(`https://tt-api-dl.vercel.app/stalk?username=${url}`);
+        } else {
+            var { data } = await axios.get(`https://tt-api-dl.vercel.app/down?version=${version}&link=${url}`);
+        }
+        return data
+    } catch (err) {
+        return err
+    }
+}
   //bot.sendMessage(chatId, `${text}`);
   if (text == '/start'){
-      bot.sendChatAction(chatId, 'typing')
-      sleep(200)
-      bot.sendMessage(chatId, 'bot started 😁👋 paste tiktok video or photo link.',{"reply_to_message_id":`${msg_id}`});
+        bot.sendChatAction(chatId, 'typing')
+        sleep(200)
+        bot.sendMessage(chatId, 'bot started 😁👋 paste tiktok video or photo link.',{"reply_to_message_id":`${msg_id}`});
   } else if (text.match(regex)){
-    bot.sendChatAction(chatId, 'typing')
-    sleep(200)
-      bot.sendMessage(chatId, `wait.. check photo or video.`,{"reply_to_message_id":`${msg_id}`})
-      
-      var words = text.split(' ');
-    if (words.length >= 2) {
+        const urls = text.match(regex)
+        bot.sendChatAction(chatId, 'typing')
+        sleep(200)
+        bot.sendMessage(chatId, `wait.. check photo or video.`,{"reply_to_message_id":`${msg_id}`})
+        var words = text.split(' ');
+        if (words.length >= 2) {
         var wo = words[1]
-        var urls = text.match(regex)
         //console.log(` url tiktok = ${text.match(regex)}`)
             if (wo == '--json'){
-                //console.log(`text ke 2 adalah berformat json`)
+                var data = getData('v2',`${urls}`)
+                if (data.status == "success"){
+                    var jsong = JSON.stringify(data)
+                    bot.editMessageText(`detect ${data.result.type} type. && type json`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
+                    bot.sendChatAction(chatId, 'typing')
+                    sleep(300)
+                    await bot.sendMessage(chatId, `${'```json'} ${jsong}${'```'}`,{"parse_mode":"markdownv2"});
+                    sleep(300)
+                    bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
+                } else {
+                    bot.sendChatAction(chatId, 'typing')
+                    sleep(200)
+                    bot.sendMessage(chatId,`${data}`)
+                }
+            } else if (wo == '--music'){
+                var data = getData('v2',`${urls}`)
+                if (data.status == "success"){
+                    var jsong = JSON.stringify(data)
+                    bot.editMessageText(`detect ${data.result.type} type. && send music`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
+                    bot.sendChatAction(chatId, 'record_voice')
+                    sleep(300)
+                    try {
+                        await bot.sendAudio(chatId, `${data.result.music}`);
+                    } catch {
+                        bot.sendChatAction(chatId, 'typing')
+                        sleep(200)
+                        bot.sendMessage(chatId, `[download music](${data.result.music})`,{"parse_mode":"markdownv2"});
+                    }
+                    sleep(300)
+                    bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
+                } else {
+                    bot.sendChatAction(chatId, 'typing')
+                    sleep(200)
+                    bot.sendMessage(chatId,`${data}`)
+                }
+            } else {
+                bot.deleteMessage(chatId, `${msg_id}`)
+                sleep(300)
                 bot.sendChatAction(chatId, 'typing')
                 sleep(200)
-                async function gut(one){
-                var { data } = await axios.get(`https://tt-api-dl.vercel.app/down?version=v2&link=${one}`);
-		var jsong = JSON.stringify(data)
-                bot.editMessageText(`detect ${data.result.type} type. && type json`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
-                await bot.sendMessage(chatId, `${'```json'} ${jsong}${'```'}`,{"parse_mode":"markdownv2"});
-                sleep(300)
-                bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
-                }
-                gut(urls)
-            } else if (wo == '--music'){
-                //console.log(`text ke 2 adalah berformat text`)
-                bot.sendChatAction(chatId, 'record_voice')
-                sleep(200)
-                async function got(one){
-                var { data } = await axios.get(`https://tt-api-dl.vercel.app/down?version=v3&link=${one}`);
-                bot.editMessageText(`detect ${data.result.type} type. && send music`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
-                try {
-                await bot.sendAudio(chatId, `${data.result.music}`);
-                } catch (e){
-                  bot.sendChatAction(chatId, 'typing')
-                  sleep(200)
-                 bot.sendMessage(chatId, `[download music](${data.result.music})`,{"parse_mode":"markdownv2"});
-                }
-                sleep(300)
-                bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
-                }
-               got(urls)
-            } else {
-                //console.log('format invalid ❌, /help'
-		//sleep(300)
-		bot.deleteMessage(chatId, `${msg_id}`)
-		sleep(300)
-		bot.sendChatAction(chatId, 'typing')
-		bot.sendMessage(chatId, `text invalid ⚠`);
-		//bot.editMessageText(`format invalid ⚠`, {"chat_id":`${chatId}`,"message_id":`${msg_id+1}`})
-		//bot.sendMessage(chatId, `text invalid ⚠`);
+                bot.sendMessage(chatId, `text invalid ⚠`);
             }
     } else {
-        //console.log(text.match(regex))
-        async function get(url) {
-          try {
-            var { data } = await axios.get(`https://tt-api-dl.vercel.app/down?version=v3&link=${url}`);
+        var data = getData('v3',`${urls}`)
+        if (data.status == "success"){
             var type = data.result.type
             var author = data.result.author.nickname
             var desc = data.result.desc
             bot.editMessageText(`detect ${type} type.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
             if (type == "video"){
-            //bot.deleteMessage(chatId, `${msgid}`)
-            bot.sendChatAction(chatId, 'upload_video')
-            await sleep(200)
-            try{
-            var escaped = desc.replace(/#/g, "\\#")
-            await bot.sendVideo(chatId, `${data.result.video2}`,
-            {
-            "caption":`\>${escaped}`,
-            "parse_mode":"markdownv2"
-            });
-            } catch {
-              await bot.sendVideo(chatId, `${data.result.video2}`,
-            {
-            "caption":`${desc}`
-            });
-            }
-            //sleep(200)
-            //bot.sendAudio(chatId, `${data.result.music}`)
-            sleep(300)
-            bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
+                bot.sendChatAction(chatId, 'upload_video')
+                await sleep(200)
+                try{
+                    var escaped = desc.replace(/#/g, "\\#")
+                    await bot.sendVideo(chatId, `${data.result.video2}`,{"caption":`\>${escaped}\r[download HD](${data.result.video_hd})`,"parse_mode":"markdownv2"});
+                } catch {
+                    await bot.sendVideo(chatId, `${data.result.video2}`,{"caption":`${desc}`});
+                }
+                sleep(300)
+                bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
             } else {
-             bot.sendChatAction(chatId, 'upload_photo')
-	    //bot.deleteMessage(chatId, `${msgid}`)
-                var dat = data.result.images
-            for (let i = 0; i < dat.length; i++) {
-                const slide = i+1
                 bot.sendChatAction(chatId, 'upload_photo')
-                bot.sendDocument(chatId, `${dat[i]}`,{"caption":`@${author} slide ${slide}`});
+                var img = data.result.images
+                for (let i = 0; i < img.length; i++) {
+                    var slide = i+1
+                    bot.sendChatAction(chatId, 'upload_photo')
+                    sleep(200)
+                    bot.sendDocument(chatId, `${dat[i]}`,{"caption":`@${author} slide ${slide}`});
+                }
+                sleep(300)
+                bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
             }
-            sleep(300)
-            bot.editMessageText(`success.`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
-           }
-          } catch (er){
+        } else {
             bot.sendChatAction(chatId, 'typing')
             sleep(200)
-            bot.sendMessage(chatId, `${er}`);
-          }
-      }
-     get(text)
-    } 
-      //get(text)
+            bot.sendMessage(chatId,`${data}`)
+        }
+  } else if (text == '/stalk'){
+    var words = text.split(' ');
+    var wo = words[1]
+    if (wo == ''){
+        bot.sendChatAction(chatId, 'typing')
+        sleep(200)
+        bot.sendMessage(chatId,`username require!! ex: /stalk username`)
+    } else {
+    var data = getData('/stalk',`${wo}`)
+        if (data.status == "success"){
+            var datail = `
+            username: ${data.result.users.username}\r
+            nickname: ${data.result.users.nickname}\r
+            verified: ${data.result.users.verified}\r
+            privateAccount: ${data.result.users.privateAccount}\r
+            region: ${data.result.users.region}\r
+            follower: ${data.result.stats.followerCount}\r
+            following: ${data.result.stats.followingCount}\r
+            heart: ${data.result.stats.heartCount}\r
+            video: ${data.result.stats.videoCount}\r
+            like: ${data.result.stats.likeCount}\r
+            friend: ${data.result.stats.friendCount}\r
+            `
+            bot.sendChatAction(chatId, 'upload_photo')
+            bot.sendPhoto(chatId, `${data.result.users.avatarLarger}`)
+            sleep(200)
+            bot.sendChatAction(chatId, 'typing')
+            bot.sendMessage(chatId,detail)
+        } else {
+            bot.sendChatAction(chatId, 'typing')
+            sleep(200)
+            bot.sendMessage(chatId,`${data}`)
+        }
+    }
   } else if (text == '/donate'){
     bot.sendChatAction(chatId, 'typing')
     sleep(200)
-      bot.sendPhoto(chatId, 'https://i.ibb.co/q1BD5vx/Screenshot-20240419-214501.png',{"caption":"donate for buy hosting pm @rickk1kch, tank you."})
+      bot.sendPhoto(chatId, 'https://raw.githubusercontent.com/ahmadqsyaa/bot-down-tiktok/main/img.png',{"caption":"donate for hosting pm @rickk1kch, tank you."})
   } else if(text == '/help'){
     bot.sendChatAction(chatId, 'typing')
     sleep(200)
@@ -151,8 +183,9 @@ const regex = /^https?:\/\/([a-z]+\.|)tiktok\.com\/([\w]+|\@\D+\w+)/g;
 > if you want to download videos or photos you just send the url
 > if you want to download music then you need to add --music after the url
 > if you need json data then you just add --json after the url
+> stalk for info detail user, /stalk username
 Example:
-https://vt.tiktok.com/abc123 --music/--json optional`);
+https://vt*tiktok*com/abc123 --music/--json optional`);
   } else {
     bot.sendChatAction(chatId, 'typing')
     sleep(200)
@@ -160,4 +193,3 @@ https://vt.tiktok.com/abc123 --music/--json optional`);
   }
 });
 app.listen(8080, () => console.log('Server started 3000'));
-
