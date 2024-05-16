@@ -61,7 +61,8 @@ async function getData(version, url){
         var wo = words[1]
         //console.log(` url tiktok = ${text.match(regex)}`)
             if (wo == '--json'){
-                var data = getData('v2',`${urls}`)
+                (async function(){
+                var data = await getData('v2',`${urls}`)
                 if (data.status == "success"){
                     var jsong = JSON.stringify(data)
                     bot.editMessageText(`detect ${data.result.type} type. && type json`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
@@ -74,9 +75,11 @@ async function getData(version, url){
                     bot.sendChatAction(chatId, 'typing')
                     sleep(200)
                     bot.sendMessage(chatId,`${data}`)
-                }
+                }        
+            })()
             } else if (wo == '--music'){
-                var data = getData('v2',`${urls}`)
+                (async function(){
+                var data = await getData('v2',`${urls}`)
                 if (data.status == "success"){
                     var jsong = JSON.stringify(data)
                     bot.editMessageText(`detect ${data.result.type} type. && send music`, {"chat_id":`${chatId}`,"message_id":`${msgid}`})
@@ -95,7 +98,8 @@ async function getData(version, url){
                     bot.sendChatAction(chatId, 'typing')
                     sleep(200)
                     bot.sendMessage(chatId,`${data}`)
-                }
+                }              
+            })()
             } else {
                 bot.deleteMessage(chatId, `${msg_id}`)
                 sleep(300)
@@ -105,7 +109,8 @@ async function getData(version, url){
             }
 
     } else {
-        var data = getData('v3',`${urls}`)
+        (async function(){
+        var data = await getData('v3',`${urls}`)
         if (data.status == "success"){
             var type = data.result.type
             var author = data.result.author.nickname
@@ -138,9 +143,8 @@ async function getData(version, url){
             bot.sendChatAction(chatId, 'typing')
             sleep(200)
             bot.sendMessage(chatId,`${data}`)
-        }
-
-    
+        }    
+    })()
     }
   } else if (text == '/stalk'){
     var words = text.split(' ');
@@ -150,7 +154,8 @@ async function getData(version, url){
         sleep(200)
         bot.sendMessage(chatId,`username require!! ex: /stalk username`)
     } else {
-    var data = getData('/stalk',`${wo}`)
+    (async function(){
+        var data = await getData('/stalk',`${wo}`)
         if (data.status == "success"){
             var datail = `
             username: ${data.result.users.username}\r
@@ -175,6 +180,7 @@ async function getData(version, url){
             sleep(200)
             bot.sendMessage(chatId,`${data}`)
         }
+    })()
     }
   } else if (text == '/donate'){
     bot.sendChatAction(chatId, 'typing')
